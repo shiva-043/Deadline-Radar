@@ -4,10 +4,23 @@ body {
   color: white;
 }
 
-.todo-grid,
 .todo-input-grid {
   display: grid;
-  grid-template-columns: 200px 150px 100px;
+  grid-template-columns: 200px 150px 100px 100px 100px;
+  column-gap: 10px;
+  row-gap: 10px;
+  align-items: center;
+}
+.todo-grid {
+  display: grid;
+  grid-template-columns: 200px 150px 100px 100px 100px 100px 150px;
+  column-gap: 10px;
+  row-gap: 10px;
+  align-items: center;
+}
+.completed-list {
+  display: grid;
+  grid-template-columns: 200px 150px 100px 100px 100px 100px 150px;
   column-gap: 10px;
   row-gap: 10px;
   align-items: center;
@@ -40,4 +53,13 @@ body {
   cursor: pointer;
   padding-top: 10px;
   padding-bottom: 10px;
+}
+.edit-button{
+  background-color: rgb(104, 139, 0);
+  color: white;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  padding-top: 10px;
+  padding-bottom: 10px; 
 }

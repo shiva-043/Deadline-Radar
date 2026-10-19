@@ -9,15 +9,25 @@
   <body>
     <p>Do it before it goes to land of the dead ^^</p>
 
+    <hr>
+    <h1>Tasks to complete</h1>
     <div class="todo-input-grid">
-      <input type="text" placeholder="Todo name"
-        class="js-name-input name-input">
-      <input type="date"
-        class="js-due-date-input due-date-input">
-      <button class="add-todo-button js-add-todo-button">Add</button>
+        <input type="text" placeholder="Title"
+            class="js-name-input name-input">
+        <input type="date"
+            class="js-due-date-input due-date-input">
+        <input type="number" placeholder="Estimated hours"
+            class="js-estimatedHours-input estimatedHours-input">
+        <input type="number" placeholder="Priority"
+            class="js-priority-input priority-input">
+        <button class="add-todo-button js-add-todo-button">Add</button>
     </div>
 
     <div class="js-todo-list todo-grid"></div>
+
+    <hr>
+    <h1>Completed Tasks</h1>
+    <div class="js-completed-list completed-list"></div>
 
     <script src="script.js"></script>
   </body>
