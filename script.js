@@ -14,9 +14,15 @@ const todoList = JSON.parse(localStorage.getItem('todoList')) || [{
     estimatedHours: 4
 }]
 
-renderTodoList();
+let completedCount;
+let inCompleteCount;
+let overdueCount;
 
 function renderTodoList(){
+    completedCount = 0;
+    inCompleteCount = 0;
+    overdueCount = 0;
+
     let completedTasks = []
     let inCompleteTasks = []
     todoList.forEach(todoElement=>{
@@ -24,14 +30,17 @@ function renderTodoList(){
             completedTasks.push(todoElement)
         else
             inCompleteTasks.push(todoElement)
-    })
-    inCompleteTasks.sort((a,b) => deadScore(b)-deadScore(a))
-    // change this to show as ordered based on date of completion - by storing the its completed 
-    completedTasks.sort((a,b) => deadScore(a)-deadScore(b))
 
-    let todoListHtml =``
-    let completedListHtml = ``
-    inCompleteTasks.forEach((todoObject) => {
+        countStatistics(todoElement)
+    })
+    writeStatistics();
+    inCompleteTasks.sort((a,b) => deadScore(b)-deadScore(a))
+    completedTasks.sort((a,b) => deadScore(a)-deadScore(b)) // CHANGE this to show as ordered based on date of completion - by storing the its completed 
+
+    const filteredList = taskFilter()
+
+    let totalHtml = ``
+    filteredList.forEach((todoObject) => {
         const html = `
         <div >${todoObject.name}</div>
         <div >${deadlineStatus(todoObject.dueDate)}</div>
@@ -42,10 +51,11 @@ function renderTodoList(){
         <label> Task Complete
             <input type="checkbox" class = 'complete-check-box js-complete-check-box' data-id = "${todoObject.id}" ${todoObject.completed ? 'checked' : ''}>
         </label>
-        `;
-
-        todoListHtml += html;
+        `
+        totalHtml += html;
     });
+
+    let completedListHtml = ``
     completedTasks.forEach((todoObject) => {
         const html = `
         <div >${todoObject.name}</div>
@@ -62,7 +72,7 @@ function renderTodoList(){
         completedListHtml += html;
     });
 
-    document.querySelector('.js-todo-list').innerHTML = todoListHtml;
+    document.querySelector('.js-todo-list').innerHTML = totalHtml;
     document.querySelector('.js-completed-list').innerHTML = completedListHtml;
 
     document.querySelectorAll('.js-delete-todo-button').
@@ -89,8 +99,7 @@ function renderTodoList(){
                     console.log("Not found error")
                     return 
                 }
-                // todoList[index].completed = !todoList[index].completed;
-                todoList[index].completed = !todoList[index].checked;
+                todoList[index].completed = !todoList[index].completed;
                 saveList();
                 renderTodoList();
             });
@@ -222,9 +231,49 @@ function deadScore(todoElement){
     score *= priority
     return score
 }
+function countStatistics(todoElement){
+    if (todoElement.completed === true)
+        completedCount += 1
+    else{
+        inCompleteCount += 1
+        if (daysRemaining(todoElement.dueDate) < 0) // nan will not run make this conditon run
+            overdueCount += 1
+    }
+}
+function writeStatistics(){
+    html = `
+    <div>New tasks to complete---->${inCompleteCount-overdueCount}</div>
+    <div>Tasks to Complete---->${inCompleteCount} </div>
+    <div>Overdue Tasks---->${overdueCount} </div>
+    <div>Completed taks---->${completedCount} </div>`
+    document.querySelector('.js-statistics').innerHTML = html;
+}
 
-// const sortedIncompleteTasks = [...todoList].filter(todoElement => todoElement.completed === false).sort((a, b) => deadScore(b) - deadScore(a));
-
-// console.log(sortedIncompleteTasks); // [1, 2, 5, 9]
-// console.log(todoList);        // [5, 2, 9, 1] (unchanged)
-
+document.querySelector('.js-filter-tasks').addEventListener('change',()=>{
+    renderTodoList()
+})
+function taskFilter(){
+    // <option value="1">Incomplete Tasks</option>
+    // <option value="2">OverDue Tasks</option>
+    // <option value="3">Completed Tasks</option>
+    // <option value="4">Future Tasks</option>
+    // <option value="5">Today's Tasks</option>
+    value = Number(document.querySelector('.js-filter-tasks').value) || 1
+    let ans = []
+    todoList.forEach(todoElement =>{
+        if (todoElement.completed === true){
+            if (value === 3) ans.push(todoElement)
+        }
+        else{
+            days = daysRemaining(todoElement.dueDate)
+            if(value === 1)  ans.push(todoElement)
+            
+            if (days < 0){ if(value === 2)  ans.push(todoElement) }
+            if (days > 0){ if(value === 4)  ans.push(todoElement) }
+            if (days === 0){ if(value === 5)  ans.push(todoElement) }
+        }
+    })
+    ans.sort((a,b) => deadScore(b)-deadScore(a))
+    return ans
+}
+renderTodoList();

@@ -2,9 +2,14 @@ body {
   font-family: Arial;
   background-color: black;
   color: white;
-  text-align: center;
-}
 
+}
+.filter-tasks{
+    size: 200px;
+    padding: 8px 8px;
+    font-size: 15px;
+    margin: 20px 0px;
+}
 .todo-input-grid {
   display: grid;
   grid-template-columns: 200px 150px 115px 130px 100px;
@@ -78,4 +83,9 @@ body {
 .todo-input-grid label {
     font-size: 5px;
     text-align: center;
+}
+.statistics{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }

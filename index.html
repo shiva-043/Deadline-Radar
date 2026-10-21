@@ -10,11 +10,19 @@
     <p>Do it before it goes to land of the dead ^^</p>
 
     <hr>
-    <h1>Deadlines</h1>
-    <div> Less goo</div>
+    <h1>Dashboard Statistics</h1>
+    <div class="js-statistics statistics"> Less goo </div>
 
     <hr>
     <h1>Tasks to complete</h1>
+    <select class="js-filter-tasks filter-tasks">
+        <option value="" selected disabled>🗂️ Filter Tasks</option>
+        <option value="1">Incomplete Tasks</option>
+        <option value="2">OverDue Tasks</option>
+        <option value="3">Completed Tasks</option>
+        <option value="4">Future Tasks</option>
+        <option value="5">Today's Tasks</option>
+    </select>
     <div class="todo-input-grid">
         <input type="text" placeholder="Title"
             class="js-name-input name-input">
