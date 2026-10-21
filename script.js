@@ -1,10 +1,12 @@
 const todoList = JSON.parse(localStorage.getItem('todoList')) || [{
+    id: crypto.randomUUID(),
     name: 'WashDish',
     dueDate: '2026-12-10',
     completed: false,
     priority : 1,
     estimatedHours: 3
 },{
+    id: crypto.randomUUID(),
     name: 'Complete it as much as you can',
     dueDate: '2026-11-16',
     completed: true,
@@ -29,31 +31,31 @@ function renderTodoList(){
 
     let todoListHtml =``
     let completedListHtml = ``
-    inCompleteTasks.forEach((todoObject,index) => {
+    inCompleteTasks.forEach((todoObject) => {
         const html = `
         <div >${todoObject.name}</div>
         <div >${deadlineStatus(todoObject.dueDate)}</div>
         <div >${todoObject.estimatedHours}</div>
         <div >${todoObject.priority}</div>
-        <button class = 'edit-button js-edit-button' data-index = "${index}">Edit </button>
-        <button class = 'delete-todo-button js-delete-todo-button' data-index = "${index}">DELETE</button>
+        <button class = 'edit-button js-edit-button' data-id = "${todoObject.id}">Edit </button>
+        <button class = 'delete-todo-button js-delete-todo-button' data-id = "${todoObject.id}">DELETE</button>
         <label> Task Complete
-            <input type="checkbox" class = 'complete-check-box js-complete-check-box' data-index = "${index}" ${todoObject.completed ? 'checked' : ''}>
+            <input type="checkbox" class = 'complete-check-box js-complete-check-box' data-id = "${todoObject.id}" ${todoObject.completed ? 'checked' : ''}>
         </label>
         `;
 
         todoListHtml += html;
     });
-    completedTasks.forEach((todoObject,index) => {
+    completedTasks.forEach((todoObject) => {
         const html = `
         <div >${todoObject.name}</div>
         <div >${deadlineStatus(todoObject.dueDate)}</div>
         <div >${todoObject.estimatedHours}</div>
         <div >${todoObject.priority}</div>
-        <button class = 'edit-button js-edit-button' data-index = "${index}">Edit </button>
-        <button class = 'delete-todo-button js-delete-todo-button' data-index = "${index}">DELETE</button>
+        <button class = 'edit-button js-edit-button' data-id = "${todoObject.id}">Edit </button>
+        <button class = 'delete-todo-button js-delete-todo-button'  data-id = "${todoObject.id}">DELETE</button>
         <label> Task Complete
-            <input type="checkbox" class = 'complete-check-box js-complete-check-box' data-index = "${index}" ${todoObject.completed ? 'checked' : ''}>
+            <input type="checkbox" class = 'complete-check-box js-complete-check-box'  data-id = "${todoObject.id}" ${todoObject.completed ? 'checked' : ''}>
         </label>
         `;
 
@@ -66,7 +68,12 @@ function renderTodoList(){
     document.querySelectorAll('.js-delete-todo-button').
         forEach((deleteButton)=>{
             deleteButton.addEventListener('click',()=>{
-                const index = Number(deleteButton.dataset.index);
+                const id = deleteButton.dataset.id;
+                const index = todoList.findIndex(todo => todo.id === id);
+                if (index === -1){
+                    console.log("Not found error")
+                    return 
+                }
                 todoList.splice(index,1);
                 saveList();
                 renderTodoList();
@@ -76,8 +83,14 @@ function renderTodoList(){
     document.querySelectorAll('.js-complete-check-box').
         forEach((checkElement)=>{
             checkElement.addEventListener('change',()=>{
-                const index = Number(checkElement.dataset.index);
-                todoList[index].completed = !todoList[index].completed;
+                const id = checkElement.dataset.id;
+                const index = todoList.findIndex(todoElement => todoElement.id === id);
+                if (index === -1){
+                    console.log("Not found error")
+                    return 
+                }
+                // todoList[index].completed = !todoList[index].completed;
+                todoList[index].completed = !todoList[index].checked;
                 saveList();
                 renderTodoList();
             });
@@ -85,26 +98,27 @@ function renderTodoList(){
     document.querySelectorAll('.js-edit-button').
         forEach((editElement) => {
             editElement.addEventListener('click',()=>{
-                const index = Number(editElement.dataset.index);
-                editTodo(index);
+                const id = editElement.dataset.id;
+                editTodo(id);
             })
         });
 }
 
 document.querySelector('.js-add-todo-button').addEventListener('click', () => {
-    addTodo(null);
+    addTodo();
 });
 
-let editIndex = null;
+let editId = null;
 function addTodo(){
     const nameElement = document.querySelector('.js-name-input');
     const dueDateElement = document.querySelector('.js-due-date-input');
     const estimatedHoursElement = document.querySelector('.js-estimatedHours-input');
     const priorityElement = document.querySelector('.js-priority-input');
 
-    if (editIndex === null){
+    if (editId === null){
         if (nameElement.value.trim() !== ''){
             todoList.push({
+                id: crypto.randomUUID(),
                 name: nameElement.value,
                 dueDate: dueDateElement.value,
                 completed: false,
@@ -114,12 +128,14 @@ function addTodo(){
         }
     }
     else{
+        // no change for todoList[editIndex]id
+        const editIndex = todoList.findIndex(todoElement => todoElement.id === editId);
         todoList[editIndex].name =  nameElement.value;
         todoList[editIndex].dueDate= dueDateElement.value;
         todoList[editIndex].completed= false;
         todoList[editIndex].priority= priorityElement.value;
         todoList[editIndex].estimatedHours= estimatedHoursElement.value;
-        editIndex = null;
+        editId = null;
     }
 
     saveList();
@@ -130,13 +146,18 @@ function addTodo(){
     estimatedHoursElement.value = '';
     priorityElement.value = '';
 }
-function editTodo(index){
+function editTodo(id){
+    const index = todoList.findIndex(todoElement => todoElement.id === id);
+    if (index === -1){
+        console.log("Not found error")
+        editId = null;
+        return 
+    }
+    editId = id;
     document.querySelector('.js-name-input').value = todoList[index].name;
     document.querySelector('.js-due-date-input').value = todoList[index].dueDate;
     document.querySelector('.js-estimatedHours-input').value = todoList[index].estimatedHours;
     document.querySelector('.js-priority-input').value = todoList[index].priority;
-    
-    editIndex = index;
 }
 function saveList(){
     localStorage.setItem('todoList',JSON.stringify(todoList));
