@@ -10,6 +10,10 @@
     <p>Do it before it goes to land of the dead ^^</p>
 
     <hr>
+    <h1>Deadlines</h1>
+    <div> Less goo</div>
+
+    <hr>
     <h1>Tasks to complete</h1>
     <div class="todo-input-grid">
         <input type="text" placeholder="Title"
@@ -18,8 +22,13 @@
             class="js-due-date-input due-date-input">
         <input type="number" placeholder="Estimated hours"
             class="js-estimatedHours-input estimatedHours-input">
-        <input type="number" placeholder="Priority"
-            class="js-priority-input priority-input">
+        
+        <select class="js-priority-input priority-input" >
+            <option value="" selected disabled>--Select Priority--</option>
+            <option value="1">General</option>
+            <option value="2">Important</option>
+            <option value="3">Urgent</option>
+        </select>
         <button class="add-todo-button js-add-todo-button">Add</button>
     </div>
 
