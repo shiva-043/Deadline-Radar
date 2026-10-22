@@ -42,38 +42,23 @@ function renderTodoList(){
     let totalHtml = ``
     filteredList.forEach((todoObject) => {
         const html = `
-        <div >${todoObject.name}</div>
-        <div >${deadlineStatus(todoObject.dueDate)}</div>
-        <div >${todoObject.estimatedHours}</div>
-        <div >${todoObject.priority}</div>
-        <button class = 'edit-button js-edit-button' data-id = "${todoObject.id}">Edit </button>
-        <button class = 'delete-todo-button js-delete-todo-button' data-id = "${todoObject.id}">DELETE</button>
-        <label> Task Complete
-            <input type="checkbox" class = 'complete-check-box js-complete-check-box' data-id = "${todoObject.id}" ${todoObject.completed ? 'checked' : ''}>
-        </label>
+        
+            <div >${todoObject.name}</div>
+            <div >${deadlineStatus(todoObject.dueDate)}</div>
+            <div >${todoObject.estimatedHours}</div>
+            <div >${todoObject.priority}</div>
+            <button class = 'edit-button js-edit-button' data-id = "${todoObject.id}">Edit </button>
+            <button class = 'delete-todo-button js-delete-todo-button' data-id = "${todoObject.id}">DELETE</button>
+            <label> Task Complete
+                <input type="checkbox" class = 'complete-check-box js-complete-check-box' data-id = "${todoObject.id}" ${todoObject.completed ? 'checked' : ''}>
+            </label>
+      
         `
         totalHtml += html;
     });
 
-    let completedListHtml = ``
-    completedTasks.forEach((todoObject) => {
-        const html = `
-        <div >${todoObject.name}</div>
-        <div >${deadlineStatus(todoObject.dueDate)}</div>
-        <div >${todoObject.estimatedHours}</div>
-        <div >${todoObject.priority}</div>
-        <button class = 'edit-button js-edit-button' data-id = "${todoObject.id}">Edit </button>
-        <button class = 'delete-todo-button js-delete-todo-button'  data-id = "${todoObject.id}">DELETE</button>
-        <label> Task Complete
-            <input type="checkbox" class = 'complete-check-box js-complete-check-box'  data-id = "${todoObject.id}" ${todoObject.completed ? 'checked' : ''}>
-        </label>
-        `;
-
-        completedListHtml += html;
-    });
 
     document.querySelector('.js-todo-list').innerHTML = totalHtml;
-    document.querySelector('.js-completed-list').innerHTML = completedListHtml;
 
     document.querySelectorAll('.js-delete-todo-button').
         forEach((deleteButton)=>{
@@ -241,7 +226,7 @@ function countStatistics(todoElement){
     }
 }
 function writeStatistics(){
-    html = `
+    const html = `
     <div>New tasks to complete---->${inCompleteCount-overdueCount}</div>
     <div>Tasks to Complete---->${inCompleteCount} </div>
     <div>Overdue Tasks---->${overdueCount} </div>
