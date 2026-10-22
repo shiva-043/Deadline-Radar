@@ -7,14 +7,40 @@
     <title>Deadline-Radar</title>
 </head>
   <body>
-    <p>Do it before it goes to land of the dead ^^</p>
+    <p class="heading">Deadline-Radar</p>
+    <p class="tagline">Keeps you back on the line before it's a deadline</p>
 
     <hr>
-    <h1>Dashboard Statistics</h1>
-    <div class="js-statistics statistics"> Less goo </div>
+    <p class="dashboard-title"> Dashboard </p>
+    <div class="js-statistics statistics"> </div>
 
     <hr>
-    <h1>Tasks to complete</h1>
+
+    <section class="add-task-section">
+        <h2>Add a New Task</h2>
+        <p class="section-description">Keep track of what needs to get done.</p>
+
+        <div class="todo-input-grid">
+            <input type="text" placeholder="Task title"
+                class="js-name-input name-input">
+
+            <input type="date"
+                class="js-due-date-input due-date-input">
+
+            <input type="number" placeholder="Hours"
+                class="js-estimatedHours-input estimatedHours-input">
+
+            <select class="js-priority-input priority-input">
+                <option value="" selected disabled>Priority</option>
+                <option value="1">General</option>
+                <option value="2">Important</option>
+                <option value="3">Urgent</option>
+            </select>
+
+            <button class="add-todo-button js-add-todo-button">+ Add Task</button>
+        </div>
+    </section>
+
     <select class="js-filter-tasks filter-tasks">
         <option value="" selected disabled>🗂️ Filter Tasks</option>
         <option value="1">Incomplete Tasks</option>
@@ -23,22 +49,6 @@
         <option value="4">Future Tasks</option>
         <option value="5">Today's Tasks</option>
     </select>
-    <div class="todo-input-grid">
-        <input type="text" placeholder="Title"
-            class="js-name-input name-input">
-        <input type="date"
-            class="js-due-date-input due-date-input">
-        <input type="number" placeholder="Estimated hours"
-            class="js-estimatedHours-input estimatedHours-input">
-        
-        <select class="js-priority-input priority-input" >
-            <option value="" selected disabled>--Select Priority--</option>
-            <option value="1">General</option>
-            <option value="2">Important</option>
-            <option value="3">Urgent</option>
-        </select>
-        <button class="add-todo-button js-add-todo-button">Add</button>
-    </div>
 
     <div class="js-todo-list todo-grid"></div>
 

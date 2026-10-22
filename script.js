@@ -41,20 +41,42 @@ function renderTodoList(){
 
     let totalHtml = ``
     filteredList.forEach((todoObject) => {
-        const html = `
-        
-            <div >${todoObject.name}</div>
-            <div >${deadlineStatus(todoObject.dueDate)}</div>
-            <div >${todoObject.estimatedHours}</div>
-            <div >${todoObject.priority}</div>
-            <button class = 'edit-button js-edit-button' data-id = "${todoObject.id}">Edit </button>
-            <button class = 'delete-todo-button js-delete-todo-button' data-id = "${todoObject.id}">DELETE</button>
-            <label> Task Complete
-                <input type="checkbox" class = 'complete-check-box js-complete-check-box' data-id = "${todoObject.id}" ${todoObject.completed ? 'checked' : ''}>
-            </label>
-      
-        `
-        totalHtml += html;
+
+    const html = `
+        <article class="task-row">
+            <input
+                type="checkbox"
+                class="complete-check-box js-complete-check-box"
+                data-id="${todoObject.id}"
+                ${todoObject.completed ? 'checked' : ''}
+                aria-label="Mark ${todoObject.name} as complete"
+            >
+
+            <div class="task-main">
+                <div class="task-name">${todoObject.name}</div>
+                <div class="task-deadline">
+                    ${deadlineStatus(todoObject.dueDate)}
+                </div>
+            </div>
+
+            <div class="task-hours">
+                ${todoObject.estimatedHours || '—'} <span>hours</span>
+            </div>
+
+            <span class="priority-badge priority-${todoObject.priority}">
+                ${{1: 'General', 2: 'Important', 3: 'Urgent'}[todoObject.priority] || 'No priority'}
+            </span>
+
+            <div class="task-actions">
+                <button class="edit-button js-edit-button"
+                    data-id="${todoObject.id}">Edit</button>
+                <button class="delete-todo-button js-delete-todo-button"
+                    data-id="${todoObject.id}">Delete</button>
+            </div>
+        </article>
+    `;
+
+    totalHtml += html;
     });
 
 
@@ -227,10 +249,22 @@ function countStatistics(todoElement){
 }
 function writeStatistics(){
     const html = `
-    <div>New tasks to complete---->${inCompleteCount-overdueCount}</div>
-    <div>Tasks to Complete---->${inCompleteCount} </div>
-    <div>Overdue Tasks---->${overdueCount} </div>
-    <div>Completed taks---->${completedCount} </div>`
+    <div class="tasks-count-card">
+        <div class="tasks-description">New tasks to complete </div>
+        <div class="tasks-count">${inCompleteCount-overdueCount}</div> 
+    </div>
+    <div class="tasks-count-card">
+        <div class="tasks-description">Incomplete Tasks</div>
+        <div class="tasks-count">${inCompleteCount} </div> 
+    </div>
+    <div class="tasks-count-card">
+        <div class="tasks-description">Overdue Tasks </div>
+        <div class="tasks-count">${overdueCount} </div> 
+    </div>
+    <div class="tasks-count-card">
+        <div class="tasks-description">Completed Tasks </div>
+        <div class="tasks-count"> ${completedCount} </div> 
+    </div>`
     document.querySelector('.js-statistics').innerHTML = html;
 }
 
@@ -262,3 +296,5 @@ function taskFilter(){
     return ans
 }
 renderTodoList();
+
+//future write onclick event listeners for dashboard statistics
