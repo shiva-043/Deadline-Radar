@@ -14,9 +14,78 @@
     <p class="dashboard-title"> Dashboard </p>
     <div class="js-statistics statistics"> </div>
 
+
+    <section class="radar-section">
+        <h2>Deadline Radar</h2>
+        <p class="radar-description">
+            See your upcoming deadlines at a glance.
+        </p>
+
+        <div class="radar-layout">
+            <div class="radar-board js-radar-board"
+                aria-label="Upcoming task deadline radar">
+
+                <div class="radar-ring ring-14">
+                    <span>14 days</span>
+                </div>
+
+                <div class="radar-ring ring-7">
+                    <span>7 days</span>
+                </div>
+
+                <div class="radar-ring ring-3">
+                    <span>3 days</span>
+                </div>
+
+                <div class="radar-ring ring-1">
+                    <span>1 day</span>
+                </div>
+
+                <div class="radar-center">TODAY</div>
+            </div>
+
+            <div class="radar-legend">
+                <h3>Priority legend</h3>
+
+                <p>
+                    <span class="legend-dot radar-priority-1"></span>
+                    General
+                </p>
+
+                <p>
+                    <span class="legend-dot radar-priority-2"></span>
+                    Important
+                </p>
+
+                <p>
+                    <span class="legend-dot radar-priority-3"></span>
+                    Urgent
+                </p>
+
+                <p class="radar-help">
+                    Hover over a dot to see its task and deadline.
+                </p>
+            </div>
+        </div>
+
+        <div class="radar-details" aria-live="polite">
+            <h3 class="js-radar-task-name">Select a radar dot</h3>
+            <p class="js-radar-task-deadline">
+                Click a dot to view its deadline.
+            </p>
+            <p class="js-radar-task-meta"></p>
+        </div>
+
+        <div class="radar-overdue">
+            <h3>Overdue tasks</h3>
+            <div class="js-radar-overdue"></div>
+        </div>
+    </section>
+
+
     <hr>
 
-    <section class="add-task-section">
+    <section class="add-task-section js-add-task">
         <h2>Add a New Task</h2>
         <p class="section-description">Keep track of what needs to get done.</p>
 
@@ -48,6 +117,12 @@
         <option value="3">Completed Tasks</option>
         <option value="4">Future Tasks</option>
         <option value="5">Today's Tasks</option>
+    </select>
+    <select class="js-sort sorter">
+        <option value="" selected disabled>📶 Sort By</option>
+        <option value="2">Smart Priority (Recommended)</option>
+        <option value="1">Due Date</option>
+        <option value="3">Date of creation</option>
     </select>
 
     <div class="js-todo-list todo-grid"></div>

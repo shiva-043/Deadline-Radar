@@ -17,11 +17,17 @@ const todoList = JSON.parse(localStorage.getItem('todoList')) || [{
 let completedCount;
 let inCompleteCount;
 let overdueCount;
+let dueTodayCount;
 
-function renderTodoList(){
+let activeValue = 1;
+let sortValue = 1;
+
+
+function renderTodoList(value = activeValue){
     completedCount = 0;
     inCompleteCount = 0;
     overdueCount = 0;
+    dueTodayCount = 0;
 
     let completedTasks = []
     let inCompleteTasks = []
@@ -33,11 +39,13 @@ function renderTodoList(){
 
         countStatistics(todoElement)
     })
+
     writeStatistics();
+
     inCompleteTasks.sort((a,b) => deadScore(b)-deadScore(a))
     completedTasks.sort((a,b) => deadScore(a)-deadScore(b)) // CHANGE this to show as ordered based on date of completion - by storing the its completed 
 
-    const filteredList = taskFilter()
+    const filteredList = taskFilter(value)
 
     let totalHtml = ``
     filteredList.forEach((todoObject) => {
@@ -118,6 +126,21 @@ function renderTodoList(){
                 editTodo(id);
             })
         });
+
+    document.querySelectorAll('.js-tasks-card').
+    forEach(taskCard =>{
+        taskCard.addEventListener('click',()=>{
+            const value = Number(taskCard.dataset.value) || 1;
+            activeValue = value
+            renderTodoList(value)
+
+            document.querySelector('.js-todo-list').scrollIntoView({
+                behavior: 'smooth',
+                block : 'start'
+            })
+        })
+    })
+    renderDeadlineRadar();
 }
 
 document.querySelector('.js-add-todo-button').addEventListener('click', () => {
@@ -130,6 +153,9 @@ function addTodo(){
     const dueDateElement = document.querySelector('.js-due-date-input');
     const estimatedHoursElement = document.querySelector('.js-estimatedHours-input');
     const priorityElement = document.querySelector('.js-priority-input');
+    
+    //edge case for estimatedHours
+    if (estimatedHoursElement.value < 0) estimatedHoursElement.value = '-';
 
     if (editId === null){
         if (nameElement.value.trim() !== ''){
@@ -174,6 +200,11 @@ function editTodo(id){
     document.querySelector('.js-due-date-input').value = todoList[index].dueDate;
     document.querySelector('.js-estimatedHours-input').value = todoList[index].estimatedHours;
     document.querySelector('.js-priority-input').value = todoList[index].priority;
+
+    document.querySelector('.js-add-task').scrollIntoView({
+        behavior: 'smooth',
+        block : 'center'
+    })
 }
 function saveList(){
     localStorage.setItem('todoList',JSON.stringify(todoList));
@@ -242,26 +273,28 @@ function countStatistics(todoElement){
     if (todoElement.completed === true)
         completedCount += 1
     else{
+        const days = daysRemaining(todoElement.dueDate)
         inCompleteCount += 1
-        if (daysRemaining(todoElement.dueDate) < 0) // nan will not run make this conditon run
+        if (days == 0)  dueTodayCount += 1
+        if (days < 0) // nan will not run make this conditon run
             overdueCount += 1
     }
 }
 function writeStatistics(){
     const html = `
-    <div class="tasks-count-card">
+    <div class="tasks-count-card js-tasks-card" data-value="4">
         <div class="tasks-description">New tasks to complete </div>
-        <div class="tasks-count">${inCompleteCount-overdueCount}</div> 
+        <div class="tasks-count">${inCompleteCount-overdueCount-dueTodayCount}</div> 
     </div>
-    <div class="tasks-count-card">
+    <div class="tasks-count-card js-tasks-card" data-value="1">
         <div class="tasks-description">Incomplete Tasks</div>
         <div class="tasks-count">${inCompleteCount} </div> 
     </div>
-    <div class="tasks-count-card">
+    <div class="tasks-count-card js-tasks-card" data-value="2">
         <div class="tasks-description">Overdue Tasks </div>
         <div class="tasks-count">${overdueCount} </div> 
     </div>
-    <div class="tasks-count-card">
+    <div class="tasks-count-card js-tasks-card" data-value="3">
         <div class="tasks-description">Completed Tasks </div>
         <div class="tasks-count"> ${completedCount} </div> 
     </div>`
@@ -269,22 +302,35 @@ function writeStatistics(){
 }
 
 document.querySelector('.js-filter-tasks').addEventListener('change',()=>{
-    renderTodoList()
+    const value = Number(document.querySelector('.js-filter-tasks').value) || 1
+    activeValue = value
+    renderTodoList(value)
+    document.querySelector('.js-todo-list').scrollIntoView({
+        behavior: 'smooth',
+        block : 'start'
+    })
 })
-function taskFilter(){
+document.querySelector('.js-sort').addEventListener('change',()=>{
+    sortValue = Number(document.querySelector('.js-sort').value) || 1 
+    renderTodoList()
+    document.querySelector('.js-todo-list').scrollIntoView({
+        behavior: 'smooth',
+        block : 'start'
+    })
+})
+function taskFilter(value,sort=sortValue){
     // <option value="1">Incomplete Tasks</option>
     // <option value="2">OverDue Tasks</option>
     // <option value="3">Completed Tasks</option>
     // <option value="4">Future Tasks</option>
     // <option value="5">Today's Tasks</option>
-    value = Number(document.querySelector('.js-filter-tasks').value) || 1
     let ans = []
     todoList.forEach(todoElement =>{
         if (todoElement.completed === true){
             if (value === 3) ans.push(todoElement)
         }
         else{
-            days = daysRemaining(todoElement.dueDate)
+            const days = daysRemaining(todoElement.dueDate)
             if(value === 1)  ans.push(todoElement)
             
             if (days < 0){ if(value === 2)  ans.push(todoElement) }
@@ -292,9 +338,129 @@ function taskFilter(){
             if (days === 0){ if(value === 5)  ans.push(todoElement) }
         }
     })
-    ans.sort((a,b) => deadScore(b)-deadScore(a))
+    if (sort == 2)  ans.sort((a,b) => deadScore(b)-deadScore(a))
+    else if (sort == 1)    ans.sort((a,b) => daysRemaining(a.dueDate)-daysRemaining(b.dueDate))
+    else {console.log("No sorting")}
     return ans
 }
-renderTodoList();
 
-//future write onclick event listeners for dashboard statistics
+function renderDeadlineRadar() {
+    const board = document.querySelector('.js-radar-board');
+    const overdueBox = document.querySelector('.js-radar-overdue');
+
+    if (!board || !overdueBox) return;
+
+    // Remove the previous render's dots and empty message.
+    board.querySelectorAll('.radar-dot, .radar-empty')
+        .forEach(element => element.remove());
+
+    overdueBox.innerHTML = '';
+
+    const upcomingTasks = [];
+    const overdueTasks = [];
+
+    todoList.forEach(task => {
+        // Completed tasks don't appear on the radar.
+        if (task.completed) return;
+
+        const days = daysRemaining(task.dueDate);
+
+        // Ignore empty or invalid dates.
+        if (Number.isNaN(days)) return;
+
+        if (days < 0) {
+            overdueTasks.push(task);
+        } else {
+            upcomingTasks.push({
+                ...task,
+                daysToDue: days
+            });
+        }
+    });
+
+    // Show nearer deadlines first in the rendering order.
+    upcomingTasks.sort((a, b) => a.daysToDue - b.daysToDue);
+
+    upcomingTasks.forEach((task, index) => {
+        // Spread dots around the circle.
+        const angle = index * 137.5 * (Math.PI / 180);
+
+        // Near deadlines stay near the centre.
+        // 0 days = 17%; 14 days = 45%.
+        let radius;
+        if (task.daysToDue <=14)
+            radius = 17 + (task.daysToDue / 14) * 28;
+        else
+            radius = 48
+
+        const x = 50 + Math.cos(angle) * radius;
+        const y = 50 + Math.sin(angle) * radius;
+
+        const dot = document.createElement('button');
+        dot.type = 'button';
+
+        const priority = Number(task.priority) || 1;
+
+        dot.className = `radar-dot radar-priority-${priority}`;
+        dot.style.left = `${x}%`;
+        dot.style.top = `${y}%`;
+
+
+        dot.title = `${task.name} — ${deadlineStatus(task.dueDate)}`;
+        dot.setAttribute('aria-label', dot.title);
+        dot.dataset.taskId = task.id;
+
+        dot.addEventListener('click', () => {
+            const selectedTask = todoList.find(
+                item => item.id === dot.dataset.taskId
+            );
+
+            if (!selectedTask) return;
+
+            document.querySelector('.js-radar-task-name').textContent =
+                selectedTask.name;
+
+            document.querySelector('.js-radar-task-deadline').textContent =
+                deadlineStatus(selectedTask.dueDate);
+
+            const priorityNames = {
+                1: 'General',
+                2: 'Important',
+                3: 'Urgent'
+            };
+
+            const priority = priorityNames[Number(selectedTask.priority)] || 'No priority';
+
+            document.querySelector('.js-radar-task-meta').textContent =
+                `${priority} · ${selectedTask.estimatedHours || '—'} hours`;
+        });
+        board.appendChild(dot);
+    });
+
+
+    // Show overdue tasks separately, rather than placing
+    // negative-day tasks on the circular radar.
+    overdueTasks.sort(
+        (a, b) => daysRemaining(a.dueDate) - daysRemaining(b.dueDate)
+    );
+
+    if (overdueTasks.length === 0) {
+        overdueBox.textContent = 'No overdue tasks. Niceee!!';
+    } else {
+        const list = document.createElement('ul');
+
+        overdueTasks.forEach(task => {
+            const item = document.createElement('li');
+
+            item.textContent =
+                `${task.name} — ${deadlineStatus(task.dueDate)}`;
+
+            list.appendChild(item);
+        });
+
+        overdueBox.appendChild(list);
+    }
+}
+
+
+renderTodoList();
